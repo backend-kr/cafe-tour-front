@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    build: .
+    image: ${REGISTRY}/cafe-webapp:latest
     container_name: my-react-app
     ports:
       - "0.0.0.0:3000:3000"
