@@ -4,7 +4,7 @@ services:
     build: .
     container_name: my-react-app
     ports:
-      - "0.0.0.0:3000:80"
+      - "0.0.0.0:3000:3000"
     environment:
       - NODE_ENV=production
       - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
