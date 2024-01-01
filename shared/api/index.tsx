@@ -1,4 +1,5 @@
 import marker from "../../mock/marker.json";
+import myData from "../../mock/myData.json";
 
 export interface IMarkerResp {
   CafeId: string;
@@ -14,9 +15,39 @@ export interface IMarkerResp {
   latitude: string;
   longitude: string;
   home_page: string;
+  save?: boolean;
 }
 
-export const requestMarkerList = async () => {
+export const requestMyTourList = async () => {
+  const result: IMarkerResp[] = await JSON.parse(JSON.stringify(myData)).result;
+
+  return result;
+};
+
+export const requestMarkerList = async (isSign: boolean) => {
   const data: IMarkerResp[] = await JSON.parse(JSON.stringify(marker)).result;
-  return data.slice(0, 20);
+  let result: IMarkerResp[] = [];
+
+  if (isSign) {
+    const myList = await requestMyTourList();
+
+    result = data.reduce((acc: IMarkerResp[], cur, index) => {
+      if (myList.some((v) => cur.CafeId === v.CafeId)) {
+        acc[index] = {
+          ...cur,
+          save: true,
+        };
+      } else {
+        acc[index] = {
+          ...cur,
+          save: false,
+        };
+      }
+      return acc;
+    }, []);
+  } else {
+    result = data;
+  }
+
+  return result?.slice(0, 20);
 };

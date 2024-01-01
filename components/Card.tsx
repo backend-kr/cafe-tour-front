@@ -31,9 +31,21 @@ const Card = ({ data, onClick }: ICard) => {
             <p className="truncate text-sm">{data.menu_info}</p>
           </div>
         </div>
-        <button onClick={onClick} className="mt-auto bg-main py-[6px] px-6 rounded-full text-white text-sm">
-          여행 경로에 담기
-        </button>
+        {data.save ? (
+          <button
+            onClick={onClick}
+            className="mt-auto border border-main py-[6px] px-6 rounded-full text-main text-sm"
+          >
+            여행 경로에서 삭제
+          </button>
+        ) : (
+          <button
+            onClick={onClick}
+            className="mt-auto bg-main py-[6px] px-6 rounded-full text-white text-sm"
+          >
+            여행 경로에 담기
+          </button>
+        )}
       </div>
       <div
         className="w-1/3 h-full bg-cover bg-no-repeat bg-center rounded-lg overflow-hidden"
