@@ -20,8 +20,13 @@ export interface IMarkerResp {
 
 export const requestMyTourList = async () => {
   const result: IMarkerResp[] = await JSON.parse(JSON.stringify(myData)).result;
-
-  return result;
+  return result.reduce((acc: IMarkerResp[], cur, index) => {
+    acc[index] = {
+      ...cur,
+      save: true,
+    };
+    return acc;
+  }, []);
 };
 
 export const requestMarkerList = async (isSign: boolean) => {
