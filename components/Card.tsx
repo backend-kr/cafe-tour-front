@@ -1,4 +1,6 @@
+import { useRouter } from "next/router";
 import Image from "next/image";
+
 import { IMarkerResp } from "../shared/api";
 
 interface ICard {
@@ -7,6 +9,8 @@ interface ICard {
 }
 
 const Card = ({ data, onClick }: ICard) => {
+  const location = useRouter();
+
   return (
     <article className="flex items-center w-full h-48 p-4 shadow-[0px_0px_30px_rgba(0,0,0,0.10)] box-border rounded-xl overflow-hidden">
       <div className="flex flex-col items-start w-2/3 pr-4 box-border h-full">
@@ -36,7 +40,7 @@ const Card = ({ data, onClick }: ICard) => {
             onClick={onClick}
             className="mt-auto border border-main py-[6px] px-6 rounded-full text-main text-sm"
           >
-            여행 경로에서 삭제
+            {location.asPath.includes("myTour") ? "삭제" : "여행 경로에서 삭제"}
           </button>
         ) : (
           <button
