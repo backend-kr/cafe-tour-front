@@ -6,7 +6,7 @@ const Search = () => {
       <button className="border-none bg-none px-4 shrink-0">
         <Image width={24} height={24} src="svg/search.svg" alt="검색" />
       </button>
-      <input className="w-full outline-none mr-4 placeholder:text-neutral-300 text-base" placeholder="여행 지역을 입력해주세요." />
+      <input type="search" className="w-full outline-none mr-4 placeholder:text-neutral-300 text-base" placeholder="여행 지역을 입력해주세요." />
     </div>
   );
 };
