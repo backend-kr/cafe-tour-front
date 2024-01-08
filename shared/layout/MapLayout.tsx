@@ -57,9 +57,10 @@ const MapLayout = ({ children }: IMapLayout) => {
               />
             </button>
           )}
-          {children}
+          {!router.asPath.includes("/directions") && <>{children}</>}
         </div>
       </div>
+      {router.asPath.includes("/directions") && <>{children}</>}
     </div>
   );
 };

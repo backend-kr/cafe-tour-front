@@ -1,5 +1,6 @@
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React from "react";
+import { useRouter } from "next/router";
 import { useCallback, useState, useEffect } from "react";
 
 import { useMap } from "../../shared/contexts/Map";
@@ -9,6 +10,7 @@ import Card from "../../components/Card";
 type NaverMap = naver.maps.Map;
 
 const MyTour = () => {
+  const router = useRouter();
   const mapRef = useMap();
 
   const [isOpenPanel, setOpenPanel] = useState(false);
@@ -135,7 +137,12 @@ const MyTour = () => {
             </button>
           </div>
           <div className="mt-auto px-8 py-4">
-            <button className="bg-main text-white w-full rounded-full py-3 font-semibold">
+            <button
+              onClick={() => {
+                void router.push("/directions", undefined, { shallow: true });
+              }}
+              className="bg-main text-white w-full rounded-full py-3 font-semibold"
+            >
               경로 계산하기
             </button>
           </div>
