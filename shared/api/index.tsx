@@ -1,5 +1,7 @@
+import axios from "axios";
 import marker from "../../mock/marker.json";
 import myData from "../../mock/myData.json";
+import directions from "../../mock/directions.json";
 
 export interface IMarkerResp {
   CafeId: string;
@@ -31,7 +33,10 @@ export const requestMyTourList = async () => {
 
 export const requestMarkerList = async (isSign: boolean) => {
   const data: IMarkerResp[] = await JSON.parse(JSON.stringify(marker)).result;
+  // const data: IMarkerResp[] = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/sites/category?category=0`);
   let result: IMarkerResp[] = [];
+
+  // console.log(data)
 
   if (isSign) {
     const myList = await requestMyTourList();
@@ -55,4 +60,9 @@ export const requestMarkerList = async (isSign: boolean) => {
   }
 
   return result?.slice(0, 20);
+};
+
+export const requestDirections = async () => {
+  const data = await JSON.parse(JSON.stringify(directions)).routes[0];
+  return data;
 };

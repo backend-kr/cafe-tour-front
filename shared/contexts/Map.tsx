@@ -3,7 +3,6 @@ import {
   useContext,
   useEffect,
   useRef,
-  useLayoutEffect,
   MutableRefObject,
 } from "react";
 
@@ -24,7 +23,7 @@ type NaverMap = naver.maps.Map;
 const MapProvider = ({ children }: IMapProvider) => {
   const mapRef = useRef<NaverMap | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window !== undefined) {
       const mapOptions = {
         center: new naver.maps.LatLng(37.3595704, 127.105399),
