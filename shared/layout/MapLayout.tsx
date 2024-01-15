@@ -1,4 +1,4 @@
-import { ReactNode, useContext } from "react";
+import { ReactNode, useContext, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -13,28 +13,41 @@ interface IMapLayout {
 
 const MapLayout = ({ children }: IMapLayout) => {
   const router = useRouter();
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   const { result, setState } = useContext(CategoryContext);
   const { isSign } = useAuth();
 
   return (
     <div className="relative">
       <header className="absolute top-0 left-0 z-20 mt-6 ml-6">
-        <div className="flex items-center">
+        <div className="flex items-start">
           <Search />
-          <div className="inline-flex ml-2 px-6 bg-white h-12 font-semibold rounded-full items-center box-border shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)]">
-            대흥동
+
+          <div className="ml-2 min-w-[80px]">
+            <button
+              onClick={() => setCategoryOpen((prev) => !prev)}
+              className="bg-white h-12 w-full rounded-full shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)] font-semibold text-sm"
+            >
+              {(result && result.find((v) => v.isActive === true)?.name) ??
+                "주변"}
+            </button>
+            {categoryOpen && (
+              <ul className="flex flex-col py-2 bg-white mt-2 shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)] rounded-lg">
+                {result?.map((category) => (
+                  <li key={category.id as string}>
+                    <Category
+                      onClick={() => {
+                        setState(category.id as string);
+                        setCategoryOpen(false);
+                      }}
+                      category={category}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-        </div>
-        <div className="flex items-center gap-1 mt-3">
-          {result?.map((category) => (
-            <Category
-              onClick={() => {
-                setState(category.id as string);
-              }}
-              key={category.id as string}
-              category={category}
-            />
-          ))}
         </div>
       </header>
       <main className="z-10">

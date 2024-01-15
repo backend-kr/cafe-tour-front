@@ -10,14 +10,7 @@ const Category = ({ category, onClick }: ICategories) => {
     <button
       id={category.id as string}
       onClick={onClick}
-      style={{
-        color: category.isActive ? "#fff" : (category.color as string),
-        borderColor: category.color as string,
-        backgroundColor: category.isActive
-          ? (category.color as string)
-          : "#fff",
-      }}
-      className="px-4 py-[2px] border text-sm rounded-full inline-block shadow-[0px_0px_10px_0px_rgba(0,0,0,0.15)]"
+      className="w-full py-2 text-sm"
     >
       {category.name}
     </button>
