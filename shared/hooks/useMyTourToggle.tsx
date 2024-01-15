@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
-import { IMarkerResp } from "../api";
+
+import { IMarkerResp } from "../types";
 
 export const useMyTourToggle = () => {
   const buttonToggle = (
@@ -9,7 +10,7 @@ export const useMyTourToggle = () => {
   ) => {
     stateAction(
       data?.map((v) =>
-        v.CafeId === id ? { ...v, save: !v.save } : v
+        v.cafeId === id ? { ...v, save: !v.save } : v
       ) as IMarkerResp[]
     );
   };
