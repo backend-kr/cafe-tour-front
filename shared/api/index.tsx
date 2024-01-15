@@ -1,24 +1,10 @@
 import axios from "axios";
-import marker from "../../mock/marker.json";
+
 import myData from "../../mock/myData.json";
 import directions from "../../mock/directions.json";
+import { IMarkerResp } from "../types";
 
-export interface IMarkerResp {
-  CafeId: string;
-  menu_info: string;
-  tel: string;
-  thumUrls: string[];
-  title: string;
-  review_count: string;
-  place_review_count: string;
-  address: string;
-  road_address: string;
-  business_hours: string;
-  latitude: string;
-  longitude: string;
-  home_page: string;
-  save?: boolean;
-}
+
 
 export const requestMyTourList = async () => {
   const result: IMarkerResp[] = await JSON.parse(JSON.stringify(myData)).result;
@@ -31,18 +17,23 @@ export const requestMyTourList = async () => {
   }, []);
 };
 
-export const requestMarkerList = async (isSign: boolean) => {
-  const data: IMarkerResp[] = await JSON.parse(JSON.stringify(marker)).result;
-  // const data: IMarkerResp[] = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/sites/category?category=0`);
+export const requestMarkerList = async (
+  isSign: boolean,
+  category: string,
+  location: string
+) => {
+  const data: IMarkerResp[] = (
+    await axios.get(
+      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sites/category?category=${category}&location=${location}`
+    )
+  ).data.data;
   let result: IMarkerResp[] = [];
-
-  // console.log(data)
 
   if (isSign) {
     const myList = await requestMyTourList();
 
     result = data.reduce((acc: IMarkerResp[], cur, index) => {
-      if (myList.some((v) => cur.CafeId === v.CafeId)) {
+      if (myList.some((v) => cur.cafeId === v.cafeId)) {
         acc[index] = {
           ...cur,
           save: true,
@@ -59,7 +50,7 @@ export const requestMarkerList = async (isSign: boolean) => {
     result = data;
   }
 
-  return result?.slice(0, 20);
+  return result;
 };
 
 export const requestDirections = async () => {
