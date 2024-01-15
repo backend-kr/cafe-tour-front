@@ -1,14 +1,16 @@
 import { useContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import { isEmpty } from "lodash";
 
 import Card from "../components/Card";
-import { IMarkerResp, requestMarkerList } from "../shared/api";
 import { filters } from "../mock/filters";
 import { useActive } from "../shared/hooks/useActive";
 import { useAuth } from "../shared/contexts/Auth";
 import { useMyTourToggle } from "../shared/hooks/useMyTourToggle";
 import { CategoryContext } from "../shared/contexts/Category";
 import { useMap } from "../shared/contexts/Map";
+import { useMarkerList } from "../shared/queries/useMarkerList";
+import { IMarkerResp } from "../shared/types";
 
 type NaverMap = naver.maps.Map;
 
@@ -27,7 +29,7 @@ export default function Home() {
   );
 
   const isCategoryActive = useMemo(
-    () => categories?.some((v) => v.isActive),
+    () => categories?.find((v) => v.isActive),
     [categories]
   );
   const isAllFilter = useMemo(
@@ -35,33 +37,41 @@ export default function Home() {
     [filterList]
   );
 
+  const { data: markerData, refetch: getMarkerData } = useMarkerList(
+    isSign,
+    String(isCategoryActive?.id),
+    ""
+  );
+
   const fetchMarkerList = useCallback(async () => {
     if (mapRef.map) {
-      const data = await requestMarkerList(isSign);
+      getMarkerData();
       let markerList: naver.maps.Marker[] = [];
 
-      data.forEach((mark) => {
-        markerList.push(
-          new naver.maps.Marker({
-            position: new naver.maps.LatLng(
-              Number(mark.latitude),
-              Number(mark.longitude)
-            ),
-            map: mapRef.map!.current as NaverMap,
-          })
+      if (markerData) {
+        markerData.forEach((mark) => {
+          markerList.push(
+            new naver.maps.Marker({
+              position: new naver.maps.LatLng(
+                Number(mark.latitude),
+                Number(mark.longitude)
+              ),
+              map: mapRef.map!.current as NaverMap,
+            })
+          );
+        });
+
+        const mapCenter = new naver.maps.LatLng(
+          Number(markerData[0]?.latitude),
+          Number(markerData[0]?.longitude)
         );
-      });
+        mapRef.map!.current!.setCenter(mapCenter);
 
-      const mapCenter = new naver.maps.LatLng(
-        Number(data[0]?.latitude),
-        Number(data[0]?.longitude)
-      );
-      mapRef.map!.current!.setCenter(mapCenter);
-
-      setMarker(markerList);
-      setData(data);
+        setMarker(markerList);
+        setData(markerData);
+      }
     }
-  }, [isSign, mapRef]);
+  }, [isSign, mapRef, markerData]);
 
   const resetMap = useCallback(() => {
     setData(null);
@@ -91,7 +101,7 @@ export default function Home() {
 
   return (
     <>
-      {isCategoryActive && (
+      {!isEmpty(isCategoryActive) && (
         <aside className="bg-white h-screen w-[420px] grid shadow-[-5px_0px_10px_0px_rgba(0,0,0,0.05)] overflow-hidden">
           <div className="pt-6 px-8 pb-4">
             <div className="flex items-center justify-between min-h-[25px]">
@@ -139,8 +149,8 @@ export default function Home() {
           </div>
           <div className="overflow-y-auto px-8 pt-6 pb-8">
             {data?.map((item) => (
-              <div key={item.CafeId} className="mb-5 last:mb-0">
-                <Card data={item} onClick={() => onClickSave(item.CafeId)} />
+              <div key={item.cafeId} className="mb-5 last:mb-0">
+                <Card data={item} onClick={() => onClickSave(item.cafeId)} />
               </div>
             ))}
           </div>

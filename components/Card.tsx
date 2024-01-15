@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
 
-import { IMarkerResp } from "../shared/api";
+import { IMarkerResp } from "../shared/types";
 
 interface ICard {
   data: IMarkerResp;
@@ -26,13 +26,13 @@ const Card = ({ data, onClick }: ICard) => {
             />
           ))}
           <p className="ml-2 text-neutral-400 text-xs">
-            리뷰 {Number(data.review_count) >= 999 ? "999+" : data.review_count}
+            리뷰 {Number(data?.reviewCount) >= 999 ? "999+" : data?.reviewCount}
           </p>
         </div>
         <div className="bg-neutral-100 w-full mt-2 px-2 py-1 rounded-md">
           <h4 className="font-semibold text-sm text-main">메뉴</h4>
           <div className="overflow-hidden mt-1">
-            <p className="truncate text-sm">{data.menu_info}</p>
+            <p className="truncate text-sm">{data?.description}</p>
           </div>
         </div>
         {data.save ? (
@@ -53,7 +53,7 @@ const Card = ({ data, onClick }: ICard) => {
       </div>
       <div
         className="w-1/3 h-full bg-cover bg-no-repeat bg-center rounded-lg overflow-hidden"
-        style={{ backgroundImage: `url(${data.thumUrls[0]})` }}
+        style={{ backgroundImage: `url(${data.thumbnails[0].url})` }}
       ></div>
     </article>
   );

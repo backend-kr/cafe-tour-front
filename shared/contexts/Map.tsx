@@ -31,6 +31,27 @@ const MapProvider = ({ children }: IMapProvider) => {
       };
 
       const map = new naver.maps.Map("map", mapOptions);
+
+      map.data.setStyle(function (feature) {
+        var styleOptions = {
+          fillColor: "#ff0000",
+          fillOpacity: 0.0001,
+          strokeColor: "#ff0000",
+          strokeWeight: 2,
+          strokeOpacity: 0.4,
+        };
+
+        if (feature.getProperty("focus")) {
+          styleOptions.fillOpacity = 0.6;
+          styleOptions.fillColor = "#0f0";
+          styleOptions.strokeColor = "#0f0";
+          styleOptions.strokeWeight = 4;
+          styleOptions.strokeOpacity = 1;
+        }
+
+        return styleOptions;
+      });
+
       mapRef.current = map;
     }
   }, []);
