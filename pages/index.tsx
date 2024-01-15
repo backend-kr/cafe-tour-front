@@ -11,6 +11,7 @@ import { CategoryContext } from "../shared/contexts/Category";
 import { useMap } from "../shared/contexts/Map";
 import { useMarkerList } from "../shared/queries/useMarkerList";
 import { IMarkerResp } from "../shared/types";
+import { useMoveLocation } from "../shared/hooks/useMoveLocation";
 
 type NaverMap = naver.maps.Map;
 
@@ -22,16 +23,13 @@ export default function Home() {
   const [marker, setMarker] = useState<naver.maps.Marker[] | null>(null);
 
   const { buttonToggle } = useMyTourToggle();
-  const { result: categories } = useContext(CategoryContext);
+  const { currentActive } = useContext(CategoryContext);
   const { changeActive: changeFilterActive, result: filterList } = useActive(
     filters,
     true
   );
+  const { locationInput } = useMoveLocation();
 
-  const isCategoryActive = useMemo(
-    () => categories?.find((v) => v.isActive),
-    [categories]
-  );
   const isAllFilter = useMemo(
     () => filterList.some((filter) => filter.isActive && filter.id === "all"),
     [filterList]
@@ -39,8 +37,8 @@ export default function Home() {
 
   const { data: markerData, refetch: getMarkerData } = useMarkerList(
     isSign,
-    String(isCategoryActive?.id),
-    ""
+    String(currentActive?.id),
+    locationInput
   );
 
   const fetchMarkerList = useCallback(async () => {
@@ -91,17 +89,17 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== undefined) {
-      if (isCategoryActive) {
+      if (currentActive) {
         void fetchMarkerList();
       } else {
         void resetMap();
       }
     }
-  }, [isCategoryActive]);
+  }, [currentActive]);
 
   return (
     <>
-      {!isEmpty(isCategoryActive) && (
+      {!isEmpty(currentActive) && (
         <aside className="bg-white h-screen w-[420px] grid shadow-[-5px_0px_10px_0px_rgba(0,0,0,0.05)] overflow-hidden">
           <div className="pt-6 px-8 pb-4">
             <div className="flex items-center justify-between min-h-[25px]">

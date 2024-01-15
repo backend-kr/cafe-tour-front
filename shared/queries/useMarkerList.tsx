@@ -8,7 +8,7 @@ export const useMarkerList = (
   location: string
 ) => {
   return useQuery({
-    queryKey: ["markerList"],
+    queryKey: ["markerList", location],
     queryFn: () => requestMarkerList(isSign, category, location),
     enabled: false,
     refetchOnWindowFocus: false,

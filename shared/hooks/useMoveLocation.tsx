@@ -31,13 +31,11 @@ export const useMoveLocation = () => {
       // const cur = geo.features.find((v) =>
       //   v.properties.SIG_KOR_NM.includes(locationInput)
       // );
-
       // if (cur) {
       //   [cur].forEach((geojson: any) => {
       //     console.log(geojson);
       //     mapRef.map?.current!.data.addGeoJson(geojson, true);
       //   });
-
       //   const sw = new naver.maps.LatLng(
       //     Number(cur.geometry.coordinates[0][0][1]),
       //     Number(cur.geometry.coordinates[0][0][0])
@@ -55,7 +53,6 @@ export const useMoveLocation = () => {
       //     )
       //   );
       //   const move = new naver.maps.LatLngBounds(sw, ne);
-
       //   mapRef.map!.current!.panToBounds(move);
       // }
     }
@@ -67,5 +64,6 @@ export const useMoveLocation = () => {
     locationInput,
     handlerFilterLocation,
     filterLocationList,
+    setFilterLocationList,
   };
 };

@@ -1,4 +1,11 @@
-import { ReactNode, useContext, useState } from "react";
+import {
+  KeyboardEvent,
+  ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -6,6 +13,8 @@ import Category from "../../components/Category";
 import Search from "../../components/Search";
 import { CategoryContext } from "../contexts/Category";
 import { useAuth } from "../contexts/Auth";
+import { useMoveLocation } from "../hooks/useMoveLocation";
+import { useMarkerList } from "../queries/useMarkerList";
 
 interface IMapLayout {
   children: ReactNode;
@@ -15,15 +24,52 @@ const MapLayout = ({ children }: IMapLayout) => {
   const router = useRouter();
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const { result, setState } = useContext(CategoryContext);
   const { isSign } = useAuth();
+  const { result, setState, currentActive } = useContext(CategoryContext);
+  const {
+    onChangeLocation,
+    locationInput,
+    handlerFilterLocation,
+    filterLocationList,
+    setFilterLocationList,
+  } = useMoveLocation();
+
+  const { data: markerData, refetch: getMarkerData } = useMarkerList(
+    isSign,
+    String(currentActive?.id),
+    locationInput
+  );
+
+  const onKeyPressSearch = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>, location: string) => {
+      if (e.key === "Enter") {
+        handlerFilterLocation(e, location);
+      }
+    },
+    [locationInput]
+  );
+
+  // console.log(locationInput);
+
+  const getData = async(location: string) => {
+    await onChangeLocation(location);
+    setFilterLocationList([]);
+    console.log(locationInput);
+    getMarkerData();
+  };
 
   return (
     <div className="relative">
       <header className="absolute top-0 left-0 z-20 mt-6 ml-6">
         <div className="flex items-start">
-          <Search />
-
+          <Search
+            handlerSearch={handlerFilterLocation}
+            onKeyPressSearch={onKeyPressSearch}
+            onChangeInput={onChangeLocation}
+            searchValue={locationInput}
+            getData={getData}
+            locationList={filterLocationList}
+          />
           <div className="ml-2 min-w-[80px]">
             <button
               onClick={() => setCategoryOpen((prev) => !prev)}

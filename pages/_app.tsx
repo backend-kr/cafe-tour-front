@@ -10,6 +10,7 @@ import "../styles/globals.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { LocationContext } from "../shared/contexts/Location";
 import { useMoveLocation } from "../shared/hooks/useMoveLocation";
+import { useMemo } from "react";
 
 const queryClient = new QueryClient();
 
@@ -18,11 +19,20 @@ const App = ({ Component, pageProps }: AppProps) => {
     useActive(categories);
   const { locationInput } = useMoveLocation();
 
+  const isCategoryActive = useMemo(
+    () => categoryList?.find((v) => v.isActive),
+    [categoryList]
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <LocationContext.Provider value={{ location: locationInput }}>
         <CategoryContext.Provider
-          value={{ setState: changeCategoryActive, result: categoryList }}
+          value={{
+            setState: changeCategoryActive,
+            result: categoryList,
+            currentActive: isCategoryActive,
+          }}
         >
           <AuthProvider>
             <MapProvider>
