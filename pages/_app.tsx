@@ -7,23 +7,33 @@ import MapLayout from "../shared/layout/MapLayout";
 import MapProvider from "../shared/contexts/Map";
 
 import "../styles/globals.css";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { LocationContext } from "../shared/contexts/Location";
+import { useMoveLocation } from "../shared/hooks/useMoveLocation";
+
+const queryClient = new QueryClient();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const { changeActive: changeCategoryActive, result: categoryList } =
     useActive(categories);
+  const { locationInput } = useMoveLocation();
 
   return (
-    <CategoryContext.Provider
-      value={{ setState: changeCategoryActive, result: categoryList }}
-    >
-      <AuthProvider>
-        <MapProvider>
-          <MapLayout>
-            <Component {...pageProps} />
-          </MapLayout>
-        </MapProvider>
-      </AuthProvider>
-    </CategoryContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <LocationContext.Provider value={{ location: locationInput }}>
+        <CategoryContext.Provider
+          value={{ setState: changeCategoryActive, result: categoryList }}
+        >
+          <AuthProvider>
+            <MapProvider>
+              <MapLayout>
+                <Component {...pageProps} />
+              </MapLayout>
+            </MapProvider>
+          </AuthProvider>
+        </CategoryContext.Provider>
+      </LocationContext.Provider>
+    </QueryClientProvider>
   );
 };
 
