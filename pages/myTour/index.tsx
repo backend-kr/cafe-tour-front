@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import { useCallback, useState, useEffect } from "react";
 
 import { useMap } from "../../shared/contexts/Map";
-import { IMarkerResp, requestMyTourList } from "../../shared/api";
+import { requestMyTourList } from "../../shared/api";
+import { IMarkerResp } from "../../shared/types";
 import Card from "../../components/Card";
 
 type NaverMap = naver.maps.Map;
@@ -71,7 +72,7 @@ const MyTour = () => {
         </div>
         <div className="overflow-y-auto px-8 pt-6 pb-8">
           {data?.map((item) => (
-            <div key={item.CafeId} className="mb-5 last:mb-0">
+            <div key={item.cafeId} className="mb-5 last:mb-0">
               <Card data={item} onClick={() => console.log("")} />
             </div>
           ))}
