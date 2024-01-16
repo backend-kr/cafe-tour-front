@@ -1,9 +1,39 @@
-import { createContext } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 
 interface ILocation {
-  location: string;
+  locationValue: string;
+  setLocationValue: Dispatch<SetStateAction<string>>;
 }
 
-export const LocationContext = createContext<ILocation>({
-  location: "",
+interface ILocationProvider {
+  children: JSX.Element | JSX.Element[];
+}
+
+const LocationContext = createContext<ILocation>({
+  locationValue: "",
+  setLocationValue: () => "",
 });
+
+const LocationProvider = ({ children }: ILocationProvider) => {
+  const [locationValue, setLocationValue] = useState<string>("");
+
+  return (
+    <LocationContext.Provider
+      value={{
+        locationValue: locationValue,
+        setLocationValue: setLocationValue,
+      }}
+    >
+      {children}
+    </LocationContext.Provider>
+  );
+};
+
+export default LocationProvider;
+export const useCurLocation = () => useContext(LocationContext);

@@ -2,22 +2,18 @@ import { KeyboardEvent, MouseEvent, useState } from "react";
 
 import { useMap } from "../contexts/Map";
 import { locationList } from "../../mock/location";
+import { useCurLocation } from "../contexts/Location";
 
 export const useMoveLocation = () => {
   const mapRef = useMap();
-  const [locationInput, setLocationInput] = useState<string>("");
+  const { locationValue } = useCurLocation();
   const [filterLocationList, setFilterLocationList] = useState<string[]>([]);
 
-  const onChangeLocation = (location: string) => {
-    setLocationInput(location);
-  };
-
   const handlerFilterLocation = (
-    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>,
-    location: string
+    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>
   ) => {
     e.preventDefault();
-    const result = locationList.filter((v) => v.includes(location));
+    const result = locationList.filter((v) => v.includes(locationValue));
     setFilterLocationList(result);
   };
 
@@ -26,8 +22,8 @@ export const useMoveLocation = () => {
   ) => {
     e.preventDefault();
 
-    if (mapRef.map && locationInput !== "") {
-      // console.log(geo);
+    // TODO:
+    // if (mapRef.map && locationValue !== "") {
       // const cur = geo.features.find((v) =>
       //   v.properties.SIG_KOR_NM.includes(locationInput)
       // );
@@ -55,13 +51,11 @@ export const useMoveLocation = () => {
       //   const move = new naver.maps.LatLngBounds(sw, ne);
       //   mapRef.map!.current!.panToBounds(move);
       // }
-    }
+    // }
   };
 
   return {
-    onChangeLocation,
     goToLocation,
-    locationInput,
     handlerFilterLocation,
     filterLocationList,
     setFilterLocationList,

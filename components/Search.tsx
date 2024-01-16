@@ -1,35 +1,31 @@
+import { KeyboardEvent, MouseEvent } from "react";
 import Image from "next/image";
 import { isEmpty } from "lodash";
-import { Dispatch, KeyboardEvent, MouseEvent, SetStateAction } from "react";
+
+import { useCurLocation } from "../shared/contexts/Location";
 
 interface ISearch {
   handlerSearch: (
-    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>,
-    location: string
+    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>
   ) => void;
-  onKeyPressSearch: (
-    e: KeyboardEvent<HTMLInputElement>,
-    location: string
-  ) => void;
-  onChangeInput: (location: string) => void;
-  searchValue: string;
+  onKeyPressSearch: (e: KeyboardEvent<HTMLInputElement>) => void;
   locationList: string[];
-  getData: any;
+  getMarkerData: any;
 }
 
 const Search = ({
   handlerSearch,
   onKeyPressSearch,
-  onChangeInput,
-  searchValue,
   locationList,
-  getData,
+  getMarkerData,
 }: ISearch) => {
+  const { locationValue, setLocationValue } = useCurLocation();
+  
   return (
     <div className="w-80">
       <div className="w-full flex h-12 items-center bg-white box-border rounded-full shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)]">
         <button
-          onClick={(e) => handlerSearch(e, searchValue)}
+          onClick={(e) => handlerSearch(e)}
           type="button"
           className="border-none bg-none px-4 shrink-0"
         >
@@ -37,9 +33,9 @@ const Search = ({
         </button>
         <input
           type="search"
-          onKeyDown={(e) => onKeyPressSearch(e, searchValue)}
-          onChange={(e) => onChangeInput(e.target.value)}
-          value={searchValue}
+          onKeyDown={(e) => onKeyPressSearch(e)}
+          onChange={(e) => setLocationValue(e.target.value)}
+          value={locationValue}
           className="w-full outline-none mr-4 placeholder:text-neutral-300 text-base placeholder:text-sm"
           placeholder="지역 검색. 예) 서울특별시 종로구"
         />
@@ -53,9 +49,10 @@ const Search = ({
             >
               <button
                 onClick={() => {
-                  getData(location);
+                  getMarkerData(location);
                 }}
                 type="button"
+                className="block w-full text-left"
               >
                 {location}
               </button>

@@ -1,23 +1,22 @@
+import { QueryClient, QueryClientProvider } from "react-query";
+import { useMemo } from "react";
 import type { AppProps } from "next/app";
+
 import AuthProvider from "../shared/contexts/Auth";
 import { CategoryContext } from "../shared/contexts/Category";
 import { useActive } from "../shared/hooks/useActive";
 import { categories } from "../mock/categories";
 import MapLayout from "../shared/layout/MapLayout";
 import MapProvider from "../shared/contexts/Map";
+import LocationProvider from "../shared/contexts/Location";
 
 import "../styles/globals.css";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { LocationContext } from "../shared/contexts/Location";
-import { useMoveLocation } from "../shared/hooks/useMoveLocation";
-import { useMemo } from "react";
 
 const queryClient = new QueryClient();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const { changeActive: changeCategoryActive, result: categoryList } =
     useActive(categories);
-  const { locationInput } = useMoveLocation();
 
   const isCategoryActive = useMemo(
     () => categoryList?.find((v) => v.isActive),
@@ -26,7 +25,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocationContext.Provider value={{ location: locationInput }}>
+      <LocationProvider>
         <CategoryContext.Provider
           value={{
             setState: changeCategoryActive,
@@ -42,7 +41,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             </MapProvider>
           </AuthProvider>
         </CategoryContext.Provider>
-      </LocationContext.Provider>
+      </LocationProvider>
     </QueryClientProvider>
   );
 };

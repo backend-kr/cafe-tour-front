@@ -11,16 +11,17 @@ import { CategoryContext } from "../shared/contexts/Category";
 import { useMap } from "../shared/contexts/Map";
 import { useMarkerList } from "../shared/queries/useMarkerList";
 import { IMarkerResp } from "../shared/types";
-import { useMoveLocation } from "../shared/hooks/useMoveLocation";
-
-type NaverMap = naver.maps.Map;
+import { useCurLocation } from "../shared/contexts/Location";
+import { usePin } from "../shared/hooks/usePin";
 
 export default function Home() {
   const router = useRouter();
   const { isSign } = useAuth();
   const mapRef = useMap();
+  const { locationValue } = useCurLocation();
+
   const [data, setData] = useState<IMarkerResp[] | null>(null);
-  const [marker, setMarker] = useState<naver.maps.Marker[] | null>(null);
+  const { fetchPin, resetPinList } = usePin();
 
   const { buttonToggle } = useMyTourToggle();
   const { currentActive } = useContext(CategoryContext);
@@ -28,7 +29,6 @@ export default function Home() {
     filters,
     true
   );
-  const { locationInput } = useMoveLocation();
 
   const isAllFilter = useMemo(
     () => filterList.some((filter) => filter.isActive && filter.id === "all"),
@@ -38,46 +38,18 @@ export default function Home() {
   const { data: markerData, refetch: getMarkerData } = useMarkerList(
     isSign,
     String(currentActive?.id),
-    locationInput
+    locationValue
   );
 
   const fetchMarkerList = useCallback(async () => {
     if (mapRef.map) {
       getMarkerData();
-      let markerList: naver.maps.Marker[] = [];
-
       if (markerData) {
-        markerData.forEach((mark) => {
-          markerList.push(
-            new naver.maps.Marker({
-              position: new naver.maps.LatLng(
-                Number(mark.latitude),
-                Number(mark.longitude)
-              ),
-              map: mapRef.map!.current as NaverMap,
-            })
-          );
-        });
-
-        const mapCenter = new naver.maps.LatLng(
-          Number(markerData[0]?.latitude),
-          Number(markerData[0]?.longitude)
-        );
-        mapRef.map!.current!.setCenter(mapCenter);
-
-        setMarker(markerList);
+        fetchPin(markerData)
         setData(markerData);
       }
     }
-  }, [isSign, mapRef, markerData]);
-
-  const resetMap = useCallback(() => {
-    setData(null);
-    setMarker(null);
-    marker?.forEach((v) => {
-      v.setMap(null);
-    });
-  }, [marker]);
+  }, [mapRef, markerData]);
 
   const onClickSave = (id: string | null) => {
     if (isSign && id) {
@@ -92,7 +64,8 @@ export default function Home() {
       if (currentActive) {
         void fetchMarkerList();
       } else {
-        void resetMap();
+        void resetPinList();
+        setData(null);
       }
     }
   }, [currentActive]);

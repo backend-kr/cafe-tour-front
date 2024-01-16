@@ -3,7 +3,6 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useMemo,
   useState,
 } from "react";
 import Image from "next/image";
@@ -14,7 +13,9 @@ import Search from "../../components/Search";
 import { CategoryContext } from "../contexts/Category";
 import { useAuth } from "../contexts/Auth";
 import { useMoveLocation } from "../hooks/useMoveLocation";
-import { useMarkerList } from "../queries/useMarkerList";
+import { useCurLocation } from "../contexts/Location";
+import { requestMarkerList } from "../api";
+import { usePin } from "../hooks/usePin";
 
 interface IMapLayout {
   children: ReactNode;
@@ -26,36 +27,29 @@ const MapLayout = ({ children }: IMapLayout) => {
 
   const { isSign } = useAuth();
   const { result, setState, currentActive } = useContext(CategoryContext);
-  const {
-    onChangeLocation,
-    locationInput,
-    handlerFilterLocation,
-    filterLocationList,
-    setFilterLocationList,
-  } = useMoveLocation();
-
-  const { data: markerData, refetch: getMarkerData } = useMarkerList(
-    isSign,
-    String(currentActive?.id),
-    locationInput
-  );
+  const { fetchPin } = usePin();
+  const { locationValue, setLocationValue } = useCurLocation();
+  const { handlerFilterLocation, filterLocationList, setFilterLocationList } =
+    useMoveLocation();
 
   const onKeyPressSearch = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>, location: string) => {
+    (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
-        handlerFilterLocation(e, location);
+        handlerFilterLocation(e);
       }
     },
-    [locationInput]
+    [locationValue]
   );
 
-  // console.log(locationInput);
-
-  const getData = async(location: string) => {
-    await onChangeLocation(location);
+  const getMarkerData = async (location: string) => {
+    setLocationValue(location);
     setFilterLocationList([]);
-    console.log(locationInput);
-    getMarkerData();
+    const data = await requestMarkerList(
+      isSign,
+      String(currentActive?.id ?? 0),
+      location
+    );
+    fetchPin(data);
   };
 
   return (
@@ -65,9 +59,7 @@ const MapLayout = ({ children }: IMapLayout) => {
           <Search
             handlerSearch={handlerFilterLocation}
             onKeyPressSearch={onKeyPressSearch}
-            onChangeInput={onChangeLocation}
-            searchValue={locationInput}
-            getData={getData}
+            getMarkerData={getMarkerData}
             locationList={filterLocationList}
           />
           <div className="ml-2 min-w-[80px]">
