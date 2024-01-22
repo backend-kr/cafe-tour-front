@@ -1,21 +1,14 @@
-import {
-  KeyboardEvent,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { KeyboardEvent, ReactNode, useCallback, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
 import Category from "../../components/Category";
 import Search from "../../components/Search";
-import { CategoryContext } from "../contexts/Category";
 import { useAuth } from "../contexts/Auth";
 import { useMoveLocation } from "../hooks/useMoveLocation";
-import { useCurLocation } from "../contexts/Location";
 import { requestMarkerList } from "../api";
 import { usePin } from "../hooks/usePin";
+import { useMap } from "../contexts/Map";
 
 interface IMapLayout {
   children: ReactNode;
@@ -26,9 +19,14 @@ const MapLayout = ({ children }: IMapLayout) => {
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   const { isSign } = useAuth();
-  const { result, setState, currentActive } = useContext(CategoryContext);
   const { fetchPin } = usePin();
-  const { locationValue, setLocationValue } = useCurLocation();
+  const {
+    searchLocation,
+    setSearchLocation,
+    categories,
+    setCategories,
+    searchCategory,
+  } = useMap();
   const { handlerFilterLocation, filterLocationList, setFilterLocationList } =
     useMoveLocation();
 
@@ -38,15 +36,15 @@ const MapLayout = ({ children }: IMapLayout) => {
         handlerFilterLocation(e);
       }
     },
-    [locationValue]
+    [searchLocation]
   );
 
   const getMarkerData = async (location: string) => {
-    setLocationValue(location);
+    setSearchLocation(location);
     setFilterLocationList([]);
     const data = await requestMarkerList(
       isSign,
-      String(currentActive?.id ?? 0),
+      String(searchCategory?.id ?? 0),
       location
     );
     fetchPin(data);
@@ -67,16 +65,17 @@ const MapLayout = ({ children }: IMapLayout) => {
               onClick={() => setCategoryOpen((prev) => !prev)}
               className="bg-white h-12 w-full rounded-full shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)] font-semibold text-sm"
             >
-              {(result && result.find((v) => v.isActive === true)?.name) ??
+              {(categories &&
+                categories.find((v) => v.isActive === true)?.name) ??
                 "주변"}
             </button>
             {categoryOpen && (
               <ul className="flex flex-col py-2 bg-white mt-2 shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)] rounded-lg">
-                {result?.map((category) => (
+                {categories?.map((category) => (
                   <li key={category.id as string}>
                     <Category
                       onClick={() => {
-                        setState(category.id as string);
+                        setCategories(category.id as string);
                         setCategoryOpen(false);
                       }}
                       category={category}

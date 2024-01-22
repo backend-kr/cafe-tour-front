@@ -1,8 +1,7 @@
 import { KeyboardEvent, MouseEvent } from "react";
 import Image from "next/image";
 import { isEmpty } from "lodash";
-
-import { useCurLocation } from "../shared/contexts/Location";
+import { useMap } from "../shared/contexts/Map";
 
 interface ISearch {
   handlerSearch: (
@@ -19,8 +18,8 @@ const Search = ({
   locationList,
   getMarkerData,
 }: ISearch) => {
-  const { locationValue, setLocationValue } = useCurLocation();
-  
+  const { searchLocation, setSearchLocation } = useMap();
+
   return (
     <div className="w-80">
       <div className="w-full flex h-12 items-center bg-white box-border rounded-full shadow-[0px_0px_15px_0px_rgba(0,0,0,0.20)]">
@@ -34,8 +33,8 @@ const Search = ({
         <input
           type="search"
           onKeyDown={(e) => onKeyPressSearch(e)}
-          onChange={(e) => setLocationValue(e.target.value)}
-          value={locationValue}
+          onChange={(e) => setSearchLocation(e.target.value)}
+          value={searchLocation}
           className="w-full outline-none mr-4 placeholder:text-neutral-300 text-base placeholder:text-sm"
           placeholder="지역 검색. 예) 서울특별시 종로구"
         />

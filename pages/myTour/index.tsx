@@ -12,7 +12,7 @@ type NaverMap = naver.maps.Map;
 
 const MyTour = () => {
   const router = useRouter();
-  const mapRef = useMap();
+  const { mapRef } = useMap();
 
   const [isOpenPanel, setOpenPanel] = useState(false);
   const [data, setData] = useState<IMarkerResp[] | null>(null);
@@ -21,7 +21,7 @@ const MyTour = () => {
   const [elArr, setAddEl] = useState<string[]>([]);
 
   const fetchMyData = useCallback(async () => {
-    if (mapRef.map) {
+    if (mapRef) {
       const data = await requestMyTourList();
       let markerList: naver.maps.Marker[] = [];
 
@@ -32,7 +32,7 @@ const MyTour = () => {
               Number(mark.latitude),
               Number(mark.longitude)
             ),
-            map: mapRef.map!.current as NaverMap,
+            map: mapRef!.current as NaverMap,
           })
         );
       });
@@ -41,7 +41,7 @@ const MyTour = () => {
         Number(data[0]?.latitude),
         Number(data[0]?.longitude)
       );
-      mapRef.map!.current!.setCenter(mapCenter);
+      mapRef!.current!.setCenter(mapCenter);
 
       setMarker(markerList);
       setData(data);

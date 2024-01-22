@@ -7,24 +7,20 @@ import { filters } from "../mock/filters";
 import { useActive } from "../shared/hooks/useActive";
 import { useAuth } from "../shared/contexts/Auth";
 import { useMyTourToggle } from "../shared/hooks/useMyTourToggle";
-import { CategoryContext } from "../shared/contexts/Category";
 import { useMap } from "../shared/contexts/Map";
 import { useMarkerList } from "../shared/queries/useMarkerList";
 import { IMarkerResp } from "../shared/types";
-import { useCurLocation } from "../shared/contexts/Location";
 import { usePin } from "../shared/hooks/usePin";
 
 export default function Home() {
   const router = useRouter();
   const { isSign } = useAuth();
-  const mapRef = useMap();
-  const { locationValue } = useCurLocation();
+  const { mapRef, searchLocation, searchCategory } = useMap();
 
   const [data, setData] = useState<IMarkerResp[] | null>(null);
   const { fetchPin, resetPinList } = usePin();
 
   const { buttonToggle } = useMyTourToggle();
-  const { currentActive } = useContext(CategoryContext);
   const { changeActive: changeFilterActive, result: filterList } = useActive(
     filters,
     true
@@ -37,15 +33,15 @@ export default function Home() {
 
   const { data: markerData, refetch: getMarkerData } = useMarkerList(
     isSign,
-    String(currentActive?.id),
-    locationValue
+    String(searchCategory?.id),
+    searchLocation
   );
 
   const fetchMarkerList = useCallback(async () => {
-    if (mapRef.map) {
+    if (mapRef) {
       getMarkerData();
       if (markerData) {
-        fetchPin(markerData)
+        fetchPin(markerData);
         setData(markerData);
       }
     }
@@ -61,18 +57,18 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== undefined) {
-      if (currentActive) {
+      if (searchCategory) {
         void fetchMarkerList();
       } else {
         void resetPinList();
         setData(null);
       }
     }
-  }, [currentActive]);
+  }, [searchCategory]);
 
   return (
     <>
-      {!isEmpty(currentActive) && (
+      {!isEmpty(searchCategory) && (
         <aside className="bg-white h-screen w-[420px] grid shadow-[-5px_0px_10px_0px_rgba(0,0,0,0.05)] overflow-hidden">
           <div className="pt-6 px-8 pb-4">
             <div className="flex items-center justify-between min-h-[25px]">

@@ -1,13 +1,24 @@
 import {
+  Dispatch,
+  SetStateAction,
   createContext,
+  useState,
   useContext,
   useEffect,
   useRef,
   MutableRefObject,
+  useMemo,
 } from "react";
+import { IList, useActive } from "../hooks/useActive";
+import { categories } from "../../mock/categories";
 
 interface IMap {
-  map: MutableRefObject<naver.maps.Map | null> | null;
+  mapRef: MutableRefObject<naver.maps.Map | null> | null;
+  searchLocation: string;
+  setSearchLocation: Dispatch<SetStateAction<string>>;
+  categories: IList[] | null;
+  setCategories: (value: string) => void;
+  searchCategory: IList | undefined;
 }
 
 interface IMapProvider {
@@ -15,13 +26,26 @@ interface IMapProvider {
 }
 
 const MapContext = createContext<IMap>({
-  map: null,
+  mapRef: null,
+  searchLocation: "",
+  setSearchLocation: () => "",
+  categories: null,
+  setCategories: () => {},
+  searchCategory: undefined,
 });
 
 type NaverMap = naver.maps.Map;
 
 const MapProvider = ({ children }: IMapProvider) => {
+  const [locationValue, setLocationValue] = useState<string>("");
   const mapRef = useRef<NaverMap | null>(null);
+  const { changeActive: changeCategoryActive, result: categoryList } =
+    useActive(categories);
+
+  const isCategoryActive = useMemo(
+    () => categoryList?.find((v) => v.isActive),
+    [categoryList]
+  );
 
   useEffect(() => {
     if (typeof window !== undefined) {
@@ -57,7 +81,16 @@ const MapProvider = ({ children }: IMapProvider) => {
   }, []);
 
   return (
-    <MapContext.Provider value={{ map: mapRef }}>
+    <MapContext.Provider
+      value={{
+        mapRef: mapRef,
+        searchLocation: locationValue,
+        setSearchLocation: setLocationValue,
+        categories: categoryList,
+        setCategories: changeCategoryActive,
+        searchCategory: isCategoryActive,
+      }}
+    >
       {children}
     </MapContext.Provider>
   );

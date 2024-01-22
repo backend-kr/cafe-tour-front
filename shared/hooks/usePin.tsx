@@ -6,7 +6,7 @@ import { IMarkerResp } from "../types";
 type NaverMap = naver.maps.Map;
 
 export const usePin = () => {
-  const mapRef = useMap();
+  const { mapRef } = useMap();
   const [pinList, setPinList] = useState<naver.maps.Marker[] | null>(null);
 
   const fetchPin = (data: IMarkerResp[] | null) => {
@@ -20,7 +20,7 @@ export const usePin = () => {
               Number(mark.latitude),
               Number(mark.longitude)
             ),
-            map: mapRef.map!.current as NaverMap,
+            map: mapRef!.current as NaverMap,
           })
         );
       });
@@ -29,7 +29,7 @@ export const usePin = () => {
         Number(data[0]?.latitude),
         Number(data[0]?.longitude)
       );
-      mapRef.map!.current!.setCenter(mapCenter);
+      mapRef!.current!.setCenter(mapCenter);
 
       setPinList(pin);
     }
