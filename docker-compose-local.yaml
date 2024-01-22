@@ -1,11 +1,13 @@
 version: "3"
 services:
   web:
-    image: ${REGISTRY}/cafe-webapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: my-react-app
     ports:
       - "0.0.0.0:3000:3000"
     environment:
       - NODE_ENV=production
-    volumes:
-      - ${ENV_PATH}/.env:/.env
+    env_file:
+      - .env
