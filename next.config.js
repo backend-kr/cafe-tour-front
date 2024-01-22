@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+
+const NAVER_KEY = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+
 const nextConfig = {
   images: {
     disableStaticImages: true,
@@ -6,7 +9,7 @@ const nextConfig = {
     minimumCacheTTL: 31536000,
   },
   env: {
-    NAVER_CLIENT_ID: "#NAVER_CLIENT_ID",
+    NAVER_CLIENT_ID: NAVER_KEY,
   },
 };
 
