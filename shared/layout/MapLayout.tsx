@@ -1,14 +1,24 @@
-import { KeyboardEvent, ReactNode, useCallback, useState } from "react";
+import {
+  KeyboardEvent,
+  ReactNode,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import _ from "lodash";
 
 import Category from "../../components/Category";
 import Search from "../../components/Search";
 import { useAuth } from "../contexts/Auth";
-import { useMoveLocation } from "../hooks/useMoveLocation";
+import { useSearchLocation } from "../hooks/useSearchLocation";
 import { requestMarkerList } from "../api";
 import { usePin } from "../hooks/usePin";
 import { useMap } from "../contexts/Map";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 interface IMapLayout {
   children: ReactNode;
@@ -16,8 +26,13 @@ interface IMapLayout {
 
 const MapLayout = ({ children }: IMapLayout) => {
   const router = useRouter();
-  const [categoryOpen, setCategoryOpen] = useState(false);
+  const refList = useRef<HTMLElement[]>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
 
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [listIndex, setListIndex] = useState<number>(-1);
+
+  const { hasClickOutside, setHasClickOutside } = useClickOutside(searchRef);
   const { isSign } = useAuth();
   const { fetchPin } = usePin();
   const {
@@ -28,20 +43,39 @@ const MapLayout = ({ children }: IMapLayout) => {
     searchCategory,
   } = useMap();
   const { handlerFilterLocation, filterLocationList, setFilterLocationList } =
-    useMoveLocation();
+    useSearchLocation();
 
   const onKeyPressSearch = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
-        handlerFilterLocation(e);
+      const result = _.compact(refList.current);
+
+      if (filterLocationList.length > 0) {
+        switch (e.key) {
+          case "ArrowDown":
+            setListIndex(listIndex + 1);
+            if (result.length === listIndex + 1) setListIndex(0);
+            break;
+          case "ArrowUp":
+            setListIndex(listIndex - 1);
+            if (listIndex <= 0) {
+              setListIndex(-1);
+            }
+            break;
+
+          case "Enter":
+            getMarkerData(result[listIndex].textContent as string);
+            setListIndex(-1);
+            break;
+        }
       }
     },
-    [searchLocation]
+    [filterLocationList, listIndex, refList]
   );
 
   const getMarkerData = async (location: string) => {
-    setSearchLocation(location);
     setFilterLocationList([]);
+    setSearchLocation(location);
+    setHasClickOutside(false);
     const data = await requestMarkerList(
       isSign,
       String(searchCategory?.id ?? 0),
@@ -49,6 +83,25 @@ const MapLayout = ({ children }: IMapLayout) => {
     );
     fetchPin(data);
   };
+
+  useEffect(() => {
+    const result = _.compact(refList.current);
+    if (result) {
+      result[listIndex]?.classList.add("bg-neutral-100");
+
+      if (result[listIndex - 1]?.className.includes("bg-neutral-100")) {
+        result[listIndex - 1]?.classList.remove("bg-neutral-100");
+      }
+      if (result[listIndex + 1]?.className.includes("bg-neutral-100")) {
+        result[listIndex + 1]?.classList.remove("bg-neutral-100");
+      }
+
+      result[listIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [listIndex, refList]);
 
   return (
     <div className="relative">
@@ -59,6 +112,10 @@ const MapLayout = ({ children }: IMapLayout) => {
             onKeyPressSearch={onKeyPressSearch}
             getMarkerData={getMarkerData}
             locationList={filterLocationList}
+            refList={refList}
+            searchRef={searchRef}
+            hasClickOutside={hasClickOutside}
+            setHasClickOutside={setHasClickOutside}
           />
           <div className="ml-2 min-w-[80px]">
             <button
