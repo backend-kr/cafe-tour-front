@@ -9,4 +9,4 @@ services:
       - NODE_ENV=production
       - NEXT_PUBLIC_NAVER_CLIENT_ID=${NEXT_PUBLIC_NAVER_CLIENT_ID}
     volumes:
-      - ${ENV_PATH}/.env:/.env
+      - ${ENV_PATH}/.env:/app/.env
