@@ -1,18 +1,16 @@
-import { KeyboardEvent, MouseEvent, useState } from "react";
+import { KeyboardEvent, MouseEvent, useState, useDeferredValue } from "react";
+import { isEmpty } from "lodash";
 
-import { useMap } from "../contexts/Map";
 import { locationList } from "../../mock/location";
 
-export const useMoveLocation = () => {
-  const { mapRef, searchLocation } = useMap();
+export const useSearchLocation = () => {
   const [filterLocationList, setFilterLocationList] = useState<string[]>([]);
+  const resultLocationList = useDeferredValue(filterLocationList);
 
-  const handlerFilterLocation = (
-    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>
-  ) => {
-    e.preventDefault();
-    const result = locationList.filter((v) => v.includes(searchLocation));
+  const handlerFilterLocation = (search: string) => {
+    const result = locationList.filter((v) => v.includes(search));
     setFilterLocationList(result);
+    if (search === "" || isEmpty(result)) setFilterLocationList([]);
   };
 
   const goToLocation = (
@@ -55,7 +53,7 @@ export const useMoveLocation = () => {
   return {
     goToLocation,
     handlerFilterLocation,
-    filterLocationList,
+    filterLocationList: resultLocationList,
     setFilterLocationList,
   };
 };
