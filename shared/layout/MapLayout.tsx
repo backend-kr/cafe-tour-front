@@ -15,10 +15,11 @@ import Search from "../../components/Search";
 import { useAuth } from "../contexts/Auth";
 import { useSearchLocation } from "../hooks/useSearchLocation";
 import { requestMarkerList } from "../api";
-import { usePin } from "../hooks/usePin";
+import { useFetchPin } from "../hooks/useFetchPin";
 import { useMap } from "../contexts/Map";
 import { useClickOutside } from "../hooks/useClickOutside";
 import { IMarkerResp } from "../types";
+import { usePin } from "../contexts/Pin";
 
 interface IMapLayout {
   children: ReactNode;
@@ -34,9 +35,10 @@ const MapLayout = ({ children }: IMapLayout) => {
 
   const { hasClickOutside, setHasClickOutside } = useClickOutside(searchRef);
   const { isSign } = useAuth();
-  const { fetchPin } = usePin();
+  const { fetchPin } = useFetchPin();
+  const { setCards } = usePin();
   const {
-    searchLocation,
+    setCurViewLocation,
     setSearchLocation,
     categories,
     setCategories,
@@ -75,6 +77,7 @@ const MapLayout = ({ children }: IMapLayout) => {
   const getMarkerData = async (location: string) => {
     setFilterLocationList([]);
     setSearchLocation(location);
+    setCurViewLocation(location);
     setHasClickOutside(false);
 
     let data: IMarkerResp[] = [];
@@ -92,6 +95,7 @@ const MapLayout = ({ children }: IMapLayout) => {
 
     if (!_.isEmpty(data)) {
       fetchPin(data);
+      setCards(data);
     }
   };
 

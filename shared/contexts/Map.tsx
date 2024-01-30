@@ -16,6 +16,8 @@ interface IMap {
   mapRef: MutableRefObject<naver.maps.Map | null> | null;
   searchLocation: string;
   setSearchLocation: Dispatch<SetStateAction<string>>;
+  curViewLocation: string;
+  setCurViewLocation: Dispatch<SetStateAction<string>>;
   categories: IList[] | null;
   setCategories: (value: string) => void;
   searchCategory: IList | undefined;
@@ -29,6 +31,8 @@ const MapContext = createContext<IMap>({
   mapRef: null,
   searchLocation: "",
   setSearchLocation: () => "",
+  curViewLocation: "",
+  setCurViewLocation: () => "",
   categories: null,
   setCategories: () => {},
   searchCategory: undefined,
@@ -41,6 +45,7 @@ const MapProvider = ({ children }: IMapProvider) => {
   const mapRef = useRef<NaverMap | null>(null);
   const { changeActive: changeCategoryActive, result: categoryList } =
     useActive(categories);
+  const [curViewLocation, setCurViewLocation] = useState<string>("");
 
   const isCategoryActive = useMemo(
     () => categoryList?.find((v) => v.isActive),
@@ -86,6 +91,8 @@ const MapProvider = ({ children }: IMapProvider) => {
         mapRef: mapRef,
         searchLocation: locationValue,
         setSearchLocation: setLocationValue,
+        curViewLocation: curViewLocation,
+        setCurViewLocation: setCurViewLocation,
         categories: categoryList,
         setCategories: changeCategoryActive,
         searchCategory: isCategoryActive,
