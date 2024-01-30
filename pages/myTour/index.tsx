@@ -72,7 +72,7 @@ const MyTour = () => {
         </div>
         <div className="overflow-y-auto px-8 pt-6 pb-8">
           {data?.map((item) => (
-            <div key={item.cafeId} className="mb-5 last:mb-0">
+            <div key={item.id} className="mb-5 last:mb-0">
               <Card data={item} onClick={() => console.log("")} />
             </div>
           ))}

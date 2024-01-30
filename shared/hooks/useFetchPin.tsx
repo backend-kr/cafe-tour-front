@@ -1,13 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import { useMap } from "../contexts/Map";
 import { IMarkerResp } from "../types";
+import { usePin } from "../contexts/Pin";
 
 type NaverMap = naver.maps.Map;
 
-export const usePin = () => {
+export const useFetchPin = () => {
   const { mapRef } = useMap();
-  const [pinList, setPinList] = useState<naver.maps.Marker[] | null>(null);
+  const { pinList, setPinList } = usePin();
 
   const fetchPin = (data: IMarkerResp[] | null) => {
     let pin: naver.maps.Marker[] = [];
@@ -43,8 +44,6 @@ export const usePin = () => {
   }, [pinList]);
 
   return {
-    pinList,
-    setPinList,
     fetchPin,
     resetPinList,
   };

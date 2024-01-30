@@ -10,7 +10,7 @@ export const useMyTourToggle = () => {
   ) => {
     stateAction(
       data?.map((v) =>
-        v.cafeId === id ? { ...v, save: !v.save } : v
+        v.id === id ? { ...v, save: !v.save } : v
       ) as IMarkerResp[]
     );
   };

@@ -4,8 +4,6 @@ import myData from "../../mock/myData.json";
 import directions from "../../mock/directions.json";
 import { IMarkerResp } from "../types";
 
-
-
 export const requestMyTourList = async () => {
   const result: IMarkerResp[] = await JSON.parse(JSON.stringify(myData)).result;
   return result.reduce((acc: IMarkerResp[], cur, index) => {
@@ -33,7 +31,7 @@ export const requestMarkerList = async (
     const myList = await requestMyTourList();
 
     result = data.reduce((acc: IMarkerResp[], cur, index) => {
-      if (myList.some((v) => cur.cafeId === v.cafeId)) {
+      if (myList.some((v) => cur.id === v.id)) {
         acc[index] = {
           ...cur,
           save: true,

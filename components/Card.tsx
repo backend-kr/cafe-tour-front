@@ -12,9 +12,12 @@ const Card = ({ data, onClick }: ICard) => {
   const location = useRouter();
 
   return (
-    <article className="flex items-center w-full h-48 p-4 shadow-[0px_0px_30px_rgba(0,0,0,0.10)] box-border rounded-xl overflow-hidden">
-      <div className="flex flex-col items-start w-2/3 pr-4 box-border h-full">
-        <h3 className="font-semibold text-lg">{data.title}</h3>
+    <article className="flex w-full min-h-[192px] h-auto p-4 shadow-[0px_0px_30px_rgba(0,0,0,0.10)] box-border rounded-xl overflow-hidden">
+      <div className="relative w-2/3 pr-4 box-border">
+        <h3
+          dangerouslySetInnerHTML={{ __html: data.title }}
+          className="font-semibold text-lg"
+        ></h3>
         <div className="flex items-center mt-[2px]">
           {[1, 2, 3, 4, 5].map((v) => (
             <Image
@@ -26,35 +29,40 @@ const Card = ({ data, onClick }: ICard) => {
             />
           ))}
           <p className="ml-2 text-neutral-400 text-xs">
-            리뷰 {Number(data?.reviewCount) >= 999 ? "999+" : data?.reviewCount}
+            리뷰 {Number(data.reviewCount) >= 999 ? "999+" : data.reviewCount}
           </p>
         </div>
-        <div className="bg-neutral-100 w-full mt-2 px-2 py-1 rounded-md">
-          <h4 className="font-semibold text-sm text-main">메뉴</h4>
+        <div className="bg-neutral-100 mb-12 w-full mt-2 px-2 py-1 rounded-md">
+          <h4 className="font-semibold text-sm text-main">영업시간</h4>
           <div className="overflow-hidden mt-1">
-            <p className="truncate text-sm">{data?.description}</p>
+            <p className="truncate text-sm">
+              {data.businessHoursStart} ~ {data.businessHoursEnd}
+            </p>
           </div>
         </div>
         {data.save ? (
           <button
             onClick={onClick}
-            className="mt-auto border border-main py-[6px] px-6 rounded-full text-main text-sm"
+            className="absolute bottom-0 border border-main py-[6px] px-6 rounded-full text-main text-sm"
           >
             {location.asPath.includes("myTour") ? "삭제" : "여행 경로에서 삭제"}
           </button>
         ) : (
           <button
             onClick={onClick}
-            className="mt-auto bg-main py-[6px] px-6 rounded-full text-white text-sm"
+            className="absolute bottom-0 bg-main py-[6px] px-6 rounded-full text-white text-sm"
           >
             여행 경로에 담기
           </button>
         )}
       </div>
-      <div
-        className="w-1/3 h-full bg-cover bg-no-repeat bg-center rounded-lg overflow-hidden"
-        style={{ backgroundImage: `url(${data.thumbnails[0].url})` }}
-      ></div>
+      <div className="w-1/3 rounded-lg overflow-hidden">
+        <img
+          src={data.thumbnails[0].url}
+          className="w-full min-h-[160px] h-full object-cover"
+          alt="가게 썸네일"
+        />
+      </div>
     </article>
   );
 };
