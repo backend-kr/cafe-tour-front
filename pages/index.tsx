@@ -1,4 +1,4 @@
-import { useContext, useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { isEmpty } from "lodash";
 
@@ -8,44 +8,22 @@ import { useActive } from "../shared/hooks/useActive";
 import { useAuth } from "../shared/contexts/Auth";
 import { useMyTourToggle } from "../shared/hooks/useMyTourToggle";
 import { useMap } from "../shared/contexts/Map";
-import { useMarkerList } from "../shared/queries/useMarkerList";
-import { useFetchPin } from "../shared/hooks/useFetchPin";
 import { usePin } from "../shared/contexts/Pin";
 
 export default function Home() {
   const router = useRouter();
   const { isSign } = useAuth();
-  const { mapRef, curViewLocation, searchLocation, searchCategory } = useMap();
+  const { curViewLocation, searchCategory } = useMap();
   const { cards, setCards } = usePin();
 
-  const { fetchPin, resetPinList } = useFetchPin();
-
   const { buttonToggle } = useMyTourToggle();
-  const { changeActive: changeFilterActive, result: filterList } = useActive(
-    filters,
-    true
-  );
+  const { changeActive: changeFilterActive, result: filterList } =
+    useActive(filters);
 
   const isAllFilter = useMemo(
     () => filterList.some((filter) => filter.isActive && filter.id === "all"),
     [filterList]
   );
-
-  const { data: markerData, refetch: getMarkerData } = useMarkerList(
-    isSign,
-    String(searchCategory?.id),
-    searchLocation
-  );
-
-  const fetchMarkerList = useCallback(async () => {
-    if (mapRef) {
-      getMarkerData();
-      if (markerData) {
-        fetchPin(markerData);
-        setCards(markerData);
-      }
-    }
-  }, [mapRef, markerData]);
 
   const onClickSave = (id: string | null) => {
     if (isSign && id) {

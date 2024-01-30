@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { KeyboardEvent, MutableRefObject, RefObject } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, isUndefined } from "lodash";
 
 import { useMap } from "../shared/contexts/Map";
 
@@ -25,7 +25,7 @@ const Search = ({
   hasClickOutside,
   setHasClickOutside,
 }: ISearch) => {
-  const { searchLocation, setSearchLocation } = useMap();
+  const { searchLocation, setSearchLocation, searchCategory } = useMap();
 
   return (
     <div className="w-80" ref={searchRef}>
@@ -61,7 +61,14 @@ const Search = ({
               className="py-4 border-b border-neutral-200 px-6 last:border-b-0"
             >
               <button
-                onClick={() => getMarkerData(location)}
+                onClick={() =>
+                  getMarkerData(
+                    location,
+                    isUndefined(searchCategory)
+                      ? "0"
+                      : String(searchCategory.id)
+                  )
+                }
                 type="button"
                 className="block w-full text-left"
               >

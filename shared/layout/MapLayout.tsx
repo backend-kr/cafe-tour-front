@@ -18,7 +18,6 @@ import { requestMarkerList } from "../api";
 import { useFetchPin } from "../hooks/useFetchPin";
 import { useMap } from "../contexts/Map";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { IMarkerResp } from "../types";
 import { usePin } from "../contexts/Pin";
 
 interface IMapLayout {
@@ -38,6 +37,7 @@ const MapLayout = ({ children }: IMapLayout) => {
   const { fetchPin } = useFetchPin();
   const { setCards } = usePin();
   const {
+    curViewLocation,
     setCurViewLocation,
     setSearchLocation,
     categories,
@@ -65,33 +65,27 @@ const MapLayout = ({ children }: IMapLayout) => {
             break;
 
           case "Enter":
-            getMarkerData(result[listIndex].textContent as string);
+            getMarkerData(
+              result[listIndex].textContent as string,
+              _.isUndefined(searchCategory) ? "0" : String(searchCategory.id)
+            );
             setListIndex(-1);
             break;
         }
       }
     },
-    [filterLocationList, listIndex, refList]
+    [filterLocationList, listIndex, refList, searchCategory]
   );
 
-  const getMarkerData = async (location: string) => {
+  const getMarkerData = async (location: string, categoryId: string) => {
     setFilterLocationList([]);
     setSearchLocation(location);
     setCurViewLocation(location);
     setHasClickOutside(false);
+    setCategoryOpen(false);
 
-    let data: IMarkerResp[] = [];
-
-    if (_.isUndefined(searchCategory?.id)) {
-      setCategories("0");
-      data = await requestMarkerList(isSign, "0", location);
-    } else {
-      data = await requestMarkerList(
-        isSign,
-        String(searchCategory.id),
-        location
-      );
-    }
+    setCategories(categoryId);
+    const data = await requestMarkerList(isSign, categoryId, location);
 
     if (!_.isEmpty(data)) {
       fetchPin(data);
@@ -147,8 +141,7 @@ const MapLayout = ({ children }: IMapLayout) => {
                   <li key={category.id as string}>
                     <Category
                       onClick={() => {
-                        setCategories(category.id as string);
-                        setCategoryOpen(false);
+                        getMarkerData(curViewLocation, String(category.id));
                       }}
                       category={category}
                     />
