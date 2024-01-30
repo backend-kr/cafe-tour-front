@@ -5,7 +5,6 @@ import {
   useState,
   useRef,
   useEffect,
-  useMemo,
 } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -19,6 +18,7 @@ import { requestMarkerList } from "../api";
 import { usePin } from "../hooks/usePin";
 import { useMap } from "../contexts/Map";
 import { useClickOutside } from "../hooks/useClickOutside";
+import { IMarkerResp } from "../types";
 
 interface IMapLayout {
   children: ReactNode;
@@ -76,12 +76,23 @@ const MapLayout = ({ children }: IMapLayout) => {
     setFilterLocationList([]);
     setSearchLocation(location);
     setHasClickOutside(false);
-    const data = await requestMarkerList(
-      isSign,
-      String(searchCategory?.id ?? 0),
-      location
-    );
-    fetchPin(data);
+
+    let data: IMarkerResp[] = [];
+
+    if (_.isUndefined(searchCategory?.id)) {
+      setCategories("0");
+      data = await requestMarkerList(isSign, "0", location);
+    } else {
+      data = await requestMarkerList(
+        isSign,
+        String(searchCategory.id),
+        location
+      );
+    }
+
+    if (!_.isEmpty(data)) {
+      fetchPin(data);
+    }
   };
 
   useEffect(() => {
